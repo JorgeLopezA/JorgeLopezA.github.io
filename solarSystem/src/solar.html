@@ -1,0 +1,106 @@
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Three.js Solar System</title>
+
+	<link rel="stylesheet" href="../libs/jquery-ui/jquery-ui.css" />
+	<link rel="stylesheet" href="../css/main.css" />
+	<link rel="stylesheet" href="../css/threejsshaders.css" />
+
+	<script src="../libs/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+	<script src="../libs/jquery-ui/jquery-ui.js"></script>
+	<script src="../libs/three.js/three.js"></script>
+	<script src="../libs/three.js/controls/OrbitControls.js"></script>
+
+	<script id="fragmentShader" type="x-shader/x-fragment">
+
+	uniform float time;
+
+	//A sampler is a set of GLSL variable types. Variables of one of the sampler types must be uniforms or as function parameters. Each sampler in a program represents a single texture of a particular texture type.
+	uniform sampler2D glowTexture;
+
+	varying vec2 texCoord;
+
+	void main( void ) {
+
+		/*Texture2D - Retrieves texels (i.e. the color) of a texture for the given coordinates.
+		vec4 texture2D(sampler2D sampler, vec2 coord)
+		sampler - specifies the sampler to which the texture from which texels will be retrieved is bound.
+		coord - specifies the texture coordinates at which texture will be sampled.
+		*/
+		vec4 glow = texture2D( glowTexture, texCoord );
+	
+		vec2 T2 = texCoord + vec2( -0.5, 1.5 ) * time; 
+
+		T2.x += glow.g * 0.10;
+		T2.y += glow.b * 0.10;
+
+
+		vec4 color = texture2D( glowTexture, T2 );
+		vec4 newColor = ( color * color);
+		gl_FragColor = newColor;
+	}
+
+</script>
+
+	<script id="vertexShader" type="x-shader/x-vertex">
+
+	varying vec2 texCoord;
+
+	void main()
+	{
+		texCoord = uv;
+		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+		gl_Position = projectionMatrix * mvPosition;
+	}
+
+	
+
+</script>
+
+	<script src="threejsShaders.js" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+		$(document).ready(
+			function () {
+
+				var canvas = document.getElementById("webglcanvas");
+				// create the scene
+				createScene(canvas);
+
+				//initControls();
+
+				// Run the run loop
+				run();
+			}
+		);
+	</script>
+
+</head>
+
+<body>
+
+	<div id="container">
+		<canvas id="webglcanvas" width=300 height=300 style="width: 300px; height: 300px;"></canvas>
+	</div>
+
+<!---<style>
+		#webglcanvas {
+    position: absolute;
+    top:-150;
+    bottom: 0;
+    left: -550;
+    right: 0;
+    margin:auto;
+}
+	</style>
+-->
+
+<script>
+	//setTimeout(function(){ alert("Use the mouse to move around!"); }, 500);
+</script>
+
+</body>
+
+</html>
